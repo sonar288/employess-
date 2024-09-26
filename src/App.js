@@ -1,25 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-function App() {
+const App = () => {
+  const [items, setItems] = useState([]);
+  const [newItem, setNewItem] = useState('');
+
+  // Fetch items from the backend
+  useEffect(() => {
+    axios.get('http://localhost:5000/items')
+      .then(response => setItems(response.data))
+      .catch(error => console.error(error));
+  }, []);
+
+  // Add a new item
+  const addItem = () => {
+    axios.post('http://localhost:5000/items', { name: newItem })
+      .then(response => setItems([...items, response.data]))
+      .catch(error => console.error(error));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Items List</h1>
+      <ul>
+        {items.map(item => (
+          <li key={item._id}>{item.name}</li>
+        ))}
+      </ul>
+
+      <input 
+        type="text" 
+        value={newItem} 
+        onChange={e => setNewItem(e.target.value)} 
+        placeholder="Add new item" 
+      />
+      <button onClick={addItem}>Add Item</button>
     </div>
   );
-}
+};
 
 export default App;
+
+
